@@ -1,0 +1,90 @@
+import axios from "axios";
+import { toast } from "react-toastify";
+import { authContext } from "../../ContextApi/AuthContext";
+import { useContext } from "react";
+
+const AddTask = () => {
+  const { refetch } = useContext(authContext);
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const title = form.title.value;
+    const description = form.description.value;
+    const timestamp = new Date().toLocaleString();
+    const category = form.category.value;
+    const task = { title, description, timestamp, category };
+    console.table(task);
+    if (!title || !description || !category) {
+      return toast.error("All fields are required");
+    } else {
+      axios
+        .post(`http://localhost:5000/addTask`, task)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.insertedId) {
+            toast.success("Task added successfully");
+            form.reset();
+            refetch();
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  return (
+    <div className="">
+      <form onSubmit={handleAddTask} className=" w-full p-4 space-y-3 lg:w-2/3">
+        <h2 className="text-xl md:text-2xl font-bold py-4">Add New Task</h2>
+        <div className="flex flex-wrap gap-2">
+          <label className="flex flex-col gap-1 justify-start" htmlFor="title">
+            Task Title*
+            <input
+              className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
+              type="text"
+              name="title"
+            />
+          </label>
+          <label
+            className="flex flex-col gap-1 justify-start"
+            htmlFor="description"
+          >
+            Description*
+            <input
+              className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
+              type="text"
+              name="description"
+            />
+          </label>
+          <label
+            className="flex flex-col gap-1 justify-start"
+            htmlFor="category"
+          >
+            Category*
+            <select
+              className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
+              defaultValue="selected"
+              name="category"
+            >
+              <option value="selected" disabled>
+                Select category
+              </option>
+              <option value="To-Do">To-Do</option>
+              <option value="In-Progress">In-Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </label>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="py-1 px-2 lg:py-1.5 lg:px-3 border rounded-md cursor-pointer"
+            >
+              Add Task
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddTask;
