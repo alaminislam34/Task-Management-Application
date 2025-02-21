@@ -4,13 +4,18 @@ import { createContext, useEffect, useState } from "react";
 import { auth } from "../Firebase/Firebase.config";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import socket from "../Pages/Home/TaskBoard/Socket";
 
 // Fetch tasks function
 const fetchTasks = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_URL}/tasks`);
-  return response.data;
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_URL}/tasks`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    return [];
+  }
 };
-
 export const authContext = createContext();
 
 const AuthContext = ({ children }) => {
@@ -20,6 +25,7 @@ const AuthContext = ({ children }) => {
   const [modalTask, setModalTask] = useState([]);
   const [tasks, setTasks] = useState({ ToDo: [], InProgress: [], Done: [] });
 
+  console.log(tasks);
   // Use the useQuery hook to fetch tasks
   const { data, refetch } = useQuery({
     queryKey: ["tasks"],
@@ -37,13 +43,16 @@ const AuthContext = ({ children }) => {
     { ToDo: [], InProgress: [], Done: [] }
   );
 
-  // Prevent unnecessary updates to tasks by checking if formattedTasks have changed
   useEffect(() => {
-    if (formattedTasks && !deepEqual(formattedTasks, tasks)) {
-      setTasks(formattedTasks);
+    if (formattedTasks) {
+      setTasks((prevTasks) => {
+        if (!deepEqual(prevTasks, formattedTasks)) {
+          return formattedTasks;
+        }
+        return prevTasks;
+      });
     }
-  }, [formattedTasks]); // Only depend on formattedTasks, not tasks
-
+  }, [formattedTasks]);
   // Toggle the theme
   const handleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -96,6 +105,44 @@ const AuthContext = ({ children }) => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    socket.on("taskUpdate", (data) => {
+      setTasks((prevTasks) => {
+        if (data.type === "insert") {
+          return {
+            ...prevTasks,
+            [data.task.category]: [
+              ...(prevTasks[data.task.category] || []),
+              data.task,
+            ],
+          };
+        } else if (data.type === "update") {
+          return {
+            ...prevTasks,
+            [data.task.category]: prevTasks[data.task.category]
+              ? prevTasks[data.task.category].map((task) =>
+                  task._id === data.task._id ? data.task : task
+                )
+              : [],
+          };
+        } else if (data.type === "delete") {
+          return {
+            ...prevTasks,
+            [data.category]: prevTasks[data.category]
+              ? prevTasks[data.category].filter(
+                  (task) => task._id !== data.taskId
+                )
+              : [],
+          };
+        }
+        return prevTasks;
+      });
+    });
+
+    return () => {
+      socket.off("taskUpdate");
+    };
+  }, []);
   // User info for context
   const info = {
     theme,

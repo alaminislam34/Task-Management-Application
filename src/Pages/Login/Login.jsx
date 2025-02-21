@@ -1,14 +1,14 @@
 import { FcGoogle } from "react-icons/fc";
-import { authContext } from "../../ContextApi/AuthContext";
 import { useContext } from "react";
 import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth } from "../../Firebase/Firebase.config";
+import { auth } from "../../../../Task/src/Firebase/Firebase.config";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { authContext } from "../../ContextApi/AuthContext";
 
 const Login = () => {
   const { setLoading, setUser } = useContext(authContext);

@@ -6,11 +6,9 @@ import { CiEdit } from "react-icons/ci";
 import Modal from "./Modal";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
-
 const TaskBoard = () => {
   const { theme, setModalTask, tasks, setTasks, refetch } =
     useContext(authContext);
-
   const onDragEnd = (result) => {
     const { source, destination } = result;
     if (!destination) return;
@@ -58,11 +56,12 @@ const TaskBoard = () => {
       .delete(`${import.meta.env.VITE_URL}/tasks/${taskId}`)
       .then((res) => {
         console.log(res.data);
-        toast.success("Task deleted successfully");
         refetch();
+        toast.success("Task deleted successfully");
       })
       .catch((err) => console.log(err));
   };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -94,57 +93,60 @@ const TaskBoard = () => {
                 }`}
               >
                 <h2 className="text-lg font-semibold mb-2">{category}</h2>
-                {tasks[category]?.map((task, index) => (
-                  <Draggable
-                    key={task._id}
-                    draggableId={task._id}
-                    index={index}
-                    isDragDisabled={category === "Done" || task.isLocked}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...(category !== "Done" && provided.dragHandleProps)}
-                        className="p-2 my-2 shadow-xl rounded-md cursor-move relative"
-                      >
-                        {category !== "Done" && (
-                          <div className="absolute top-2 right-2 flex gap-4 items-center">
-                            <button
-                              onClick={() => {
-                                document
-                                  .getElementById("my_modal_5")
-                                  .showModal();
-                                setModalTask(task);
-                              }}
-                            >
-                              <CiEdit className="cursor-pointer" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTask(task._id)}
-                              className="cursor-pointer"
-                            >
-                              <MdDelete />
-                            </button>
+                {tasks[category]
+                  ?.slice()
+                  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                  .map((task, index) => (
+                    <Draggable
+                      key={task._id}
+                      draggableId={task._id}
+                      index={index}
+                      isDragDisabled={category === "Done" || task.isLocked}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...(category !== "Done" && provided.dragHandleProps)}
+                          className="p-2 my-2 shadow-xl rounded-md cursor-move relative"
+                        >
+                          {category !== "Done" && (
+                            <div className="absolute top-2 right-2 flex gap-4 items-center">
+                              <button
+                                onClick={() => {
+                                  document
+                                    .getElementById("my_modal_5")
+                                    .showModal();
+                                  setModalTask(task);
+                                }}
+                              >
+                                <CiEdit className="cursor-pointer" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTask(task._id)}
+                                className="cursor-pointer"
+                              >
+                                <MdDelete />
+                              </button>
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            <p className="text-xs">{task.timestamp}</p>
+                            <div className="absolute top-2 right-2">
+                              <button
+                                onClick={() => handleDeleteTask(task._id)}
+                                className="cursor-pointer"
+                              >
+                                <MdDelete />
+                              </button>
+                            </div>
+                            <h4 className="font-bold">{task.title}</h4>
+                            <p className="text-sm ">{task.description}</p>
                           </div>
-                        )}
-                        <div className="space-y-2">
-                          <p className="text-xs">{task.timestamp}</p>
-                          <div className="absolute top-2 right-2">
-                            <button
-                              onClick={() => handleDeleteTask(task._id)}
-                              className="cursor-pointer"
-                            >
-                              <MdDelete />
-                            </button>
-                          </div>
-                          <h4 className="font-bold">{task.title}</h4>
-                          <p className="text-sm ">{task.description}</p>
                         </div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+                      )}
+                    </Draggable>
+                  ))}
                 {provided.placeholder}
               </div>
             )}
