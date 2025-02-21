@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const Modal = () => {
-  const { modalTask, refetch } = useContext(authContext);
+  const { modalTask, refetch, theme } = useContext(authContext);
   const handleUpdateTask = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -40,20 +40,27 @@ const Modal = () => {
   return (
     <div>
       <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box relative">
+        <div
+          className={`modal-box p-6 lg:p-8 rounded-xl shadow-xl relative ${
+            theme === "light" ? "bg-blue-100" : "bg-[#1C2948]"
+          }`}
+        >
           <div>
-            <form onSubmit={handleUpdateTask} className="flex flex-col gap-2">
+            <form
+              onSubmit={handleUpdateTask}
+              className="flex flex-col gap-2 space-y-2"
+            >
               <p className="text-xl lg:text-2xl font-semibold py-2 lg:py-4">
                 Edit Task
               </p>
               <input
-                className="py-2 px-4 rounded-md"
+                className="py-2 px-4 rounded-md border border-gray-600 focus:outline-none focus:border-gray-400"
                 type="text"
                 name="title"
                 defaultValue={modalTask.title}
               />
               <input
-                className="py-2 px-4 rounded-md"
+                className="py-2 px-4 rounded-md border border-gray-600 focus:outline-none focus:border-gray-400"
                 type="text"
                 name="description"
                 defaultValue={modalTask.description}
@@ -61,7 +68,9 @@ const Modal = () => {
               <input
                 type="submit"
                 value="Update"
-                className="py-2 w-full rounded-md cursor-pointer border"
+                className={`py-1 w-full btn border rounded-md cursor-pointer ${
+                  theme === "light" ? "bg-blue-400" : "bg-blue-500"
+                }`}
               />
             </form>
           </div>

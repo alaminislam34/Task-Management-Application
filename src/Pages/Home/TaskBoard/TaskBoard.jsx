@@ -133,19 +133,19 @@ const TaskBoard = () => {
                   category === "Done"
                     ? `${
                         theme === "light"
-                          ? "bg-green-100 text-gray-600"
-                          : "bg-green-800/50 text-gray-300"
+                          ? "bg-[#A5D6A7] text-gray-600"
+                          : "bg-[#1B5E20] text-gray-300"
                       }`
                     : category === "InProgress"
                     ? `${
                         theme === "light"
-                          ? "bg-yellow-50 text-gray-600"
-                          : "bg-yellow-950/80 text-gray-300"
+                          ? "bg-[#FFE082] text-gray-600"
+                          : "bg-[#947400] text-gray-300"
                       }`
                     : `${
                         theme === "light"
-                          ? "bg-blue-50 text-gray-600"
-                          : "bg-blue-900/50 text-gray-300"
+                          ? "bg-[#BBDEFB] text-gray-600"
+                          : "bg-[#1E3A8A] text-gray-300"
                       }`
                 }`}
               >
