@@ -7,15 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import socket from "../Pages/Home/TaskBoard/Socket";
 
 // Fetch tasks function
-const fetchTasks = async () => {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_URL}/tasks`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    return [];
-  }
-};
+
 export const authContext = createContext();
 
 const AuthContext = ({ children }) => {
@@ -25,11 +17,16 @@ const AuthContext = ({ children }) => {
   const [modalTask, setModalTask] = useState([]);
   const [tasks, setTasks] = useState({ ToDo: [], InProgress: [], Done: [] });
 
-  console.log(tasks);
   // Use the useQuery hook to fetch tasks
   const { data, refetch } = useQuery({
     queryKey: ["tasks"],
-    queryFn: fetchTasks,
+    queryFn: async () => {
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL}/tasks?email=${user?.email}`
+      );
+      return response.data;
+    },
+    enabled: !!user,
   });
 
   // Format the fetched tasks
@@ -58,23 +55,21 @@ const AuthContext = ({ children }) => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  // User control on browser
   useEffect(() => {
     setLoading(true);
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        setLoading(false);
 
         try {
           const { data } = await axios.get(
             `${import.meta.env.VITE_URL}/users?email=${user?.email}`,
             { withCredentials: true }
           );
-          console.log(data);
+
           if (!data) {
-            const res = await axios.post(
+            await axios.post(
               `${import.meta.env.VITE_URL}/postUser`,
               {
                 name: user?.displayName,
@@ -82,22 +77,20 @@ const AuthContext = ({ children }) => {
               },
               { withCredentials: true }
             );
-            console.log(res.data);
           }
         } catch (error) {
           console.error("Error checking/adding user:", error);
+        } finally {
+          setLoading(false);
         }
       } else {
         setUser(null);
+        setLoading(false);
       }
     });
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, []);
+    return () => unsubscribe();
+  }, [setUser, setLoading]);
 
   // Theme control on browser
   useEffect(() => {

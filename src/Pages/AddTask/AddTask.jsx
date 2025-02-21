@@ -64,18 +64,6 @@ const AddTask = () => {
               name="description"
             />
           </label>
-          <label
-            htmlFor="dueDate"
-            className="flex flex-col gap-1 justify-start"
-          >
-            Due Date*
-            <input
-              type="date"
-              name="dueDate"
-              className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
-            />
-          </label>
-
           <div className="flex items-end">
             <button
               type="submit"

@@ -32,7 +32,11 @@ const Navbar = () => {
         <nav className="flex justify-between items-center max-w-6xl mx-auto py-3 px-4">
           <div>
             <img
-              onClick={() => navigate("/")}
+              onClick={() => {
+                if (user) {
+                  navigate("/");
+                }
+              }}
               src={logo}
               alt="logo"
               className="w-12 h-12 cursor-pointer"
