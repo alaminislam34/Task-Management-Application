@@ -71,6 +71,13 @@ const TaskBoard = () => {
       // Lock task if moved to Done category
       if (destinationCategory === "Done") {
         movedTask.isLocked = true;
+        toast.success("Task successfully Completed!");
+      }
+      if (destinationCategory === "InProgress") {
+        toast.info("Task moved to InProgress", {
+          icon: <GrInProgress />,
+          theme: theme === "light" ? "light" : "dark",
+        });
       }
 
       movedTask.category = destinationCategory;
@@ -121,24 +128,24 @@ const TaskBoard = () => {
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`p-3 rounded-lg shadow-xl min-h-[200px] 
+                className={`p-4 rounded-lg shadow-xl min-h-[200px] 
                 ${
                   category === "Done"
                     ? `${
                         theme === "light"
-                          ? "bg-green-200 text-gray-600"
-                          : "bg-green-800/70 text-gray-300"
+                          ? "bg-green-100 text-gray-600"
+                          : "bg-green-800/50 text-gray-300"
                       }`
                     : category === "InProgress"
                     ? `${
                         theme === "light"
-                          ? "bg-yellow-100 text-gray-600"
-                          : "bg-yellow-800/70 text-gray-300"
+                          ? "bg-yellow-50 text-gray-600"
+                          : "bg-yellow-950/80 text-gray-300"
                       }`
                     : `${
                         theme === "light"
-                          ? "bg-blue-100 text-gray-600"
-                          : "bg-blue-900/80 text-gray-300"
+                          ? "bg-blue-50 text-gray-600"
+                          : "bg-blue-900/50 text-gray-300"
                       }`
                 }`}
               >
@@ -167,7 +174,7 @@ const TaskBoard = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...(category !== "Done" && provided.dragHandleProps)}
-                          className="p-2 my-2 shadow-xl rounded-md cursor-move relative list-decimal"
+                          className="p-2 my-4 shadow-md rounded-md cursor-move backdrop-blur-md relative list-decimal"
                         >
                           {category === "ToDo" && (
                             <div className="absolute top-2 right-2 flex gap-4 items-center">
@@ -189,6 +196,14 @@ const TaskBoard = () => {
                               </button>
                             </div>
                           )}
+                          <div className="absolute top-2 right-2">
+                            <button
+                              onClick={() => handleDeleteTask(task._id)}
+                              className="cursor-pointer"
+                            >
+                              <MdDelete />
+                            </button>
+                          </div>
                           <div className="space-y-2">
                             <p className="text-xs">{task.timestamp}</p>
                             <h4 className="font-bold">{task.title}</h4>

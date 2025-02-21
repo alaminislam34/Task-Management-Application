@@ -7,28 +7,24 @@ import AddTask from "../Pages/AddTask/AddTask";
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     path: "/",
-    element: <Main />,
+    element: (
+      <ProtectedRoute>
+        <Main />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        path: "/login",
-        element: <Login />,
-      },
-      {
         path: "/",
-        element: (
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        ),
+        element: <Home />,
       },
       {
         path: "/addTask",
-        element: (
-          <ProtectedRoute>
-            <AddTask />
-          </ProtectedRoute>
-        ),
+        element: <AddTask />,
       },
     ],
   },

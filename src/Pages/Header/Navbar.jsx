@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CiDark, CiLight, CiLogout } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { authContext } from "../../ContextApi/AuthContext";
@@ -11,6 +11,7 @@ import logo from "../../assets/TMA.png";
 
 const Navbar = () => {
   const { loading } = useContext(authContext);
+  const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const logout = () => {
     signOut(auth);
@@ -26,21 +27,12 @@ const Navbar = () => {
     <div className="h-[72px]">
       <div
         className={`fixed z-50 top-0 left-0 right-0 w-full shadow-sm ${
-          theme === "light" ? "bg-blue-50 text-gray-500" : "bg-blue-900/30"
+          theme === "light" ? "bg-blue-50 text-gray-500" : "bg-[#1C2948]"
         }`}
       >
-        <nav className="flex justify-between items-center max-w-6xl mx-auto py-3 px-4">
+        <nav className="flex justify-between items-center max-w-6xl mx-auto py-3 px-4 lg:px-6">
           <div>
-            <img
-              onClick={() => {
-                if (user) {
-                  navigate("/");
-                }
-              }}
-              src={logo}
-              alt="logo"
-              className="w-12 h-12 cursor-pointer"
-            />
+            <img src={logo} alt="logo" className="w-12 h-12 cursor-pointer" />
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
@@ -55,13 +47,20 @@ const Navbar = () => {
                 )}
               </button>
               {user && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 relative">
                   <img
                     src={user?.photoURL}
+                    onClick={() => setShow(!show)}
                     alt="user"
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 rounded-full cursor-pointer"
                   />
+                  {show && (
+                    <div className="absolute top-14 right-0 w-44 p-4 text-left space-y-2 rounded-xl shadow-xl">
+                      <p>{user?.displayName}</p>
+                      <p>{user?.email}</p>
+                    </div>
+                  )}
                   <button
                     onClick={logout}
                     className={`flex items-center gap-2 py-2 px-2 ${
