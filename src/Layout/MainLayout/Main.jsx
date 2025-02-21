@@ -7,7 +7,7 @@ const Main = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <section className="min-h-[80vh] w-11/12 mx-auto p-4 lg:p-6">
+      <section className="min-h-[60vh] lg:min-h-[70vh] w-11/12 mx-auto p-4 lg:p-6">
         <Outlet />
       </section>
       <Footer />

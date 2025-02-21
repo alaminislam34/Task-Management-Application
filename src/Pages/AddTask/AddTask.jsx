@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { authContext } from "../../ContextApi/AuthContext";
 
 const AddTask = () => {
-  const { refetch } = useContext(authContext);
+  const { refetch, user } = useContext(authContext);
   const handleAddTask = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -12,7 +12,16 @@ const AddTask = () => {
     const description = form.description.value;
     const timestamp = new Date().toLocaleString();
     const category = "ToDo";
-    const task = { title, description, timestamp, category };
+    const userEmail = user?.email;
+    const userName = user?.displayName;
+    const task = {
+      title,
+      description,
+      timestamp,
+      category,
+      userName,
+      userEmail,
+    };
     console.table(task);
     if (!title || !description || !category) {
       return toast.error("All fields are required");
@@ -53,6 +62,17 @@ const AddTask = () => {
               className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
               type="text"
               name="description"
+            />
+          </label>
+          <label
+            htmlFor="dueDate"
+            className="flex flex-col gap-1 justify-start"
+          >
+            Due Date*
+            <input
+              type="date"
+              name="dueDate"
+              className="py-1 px-2 lg:py-1.5 lg:px-3 rounded-md"
             />
           </label>
 

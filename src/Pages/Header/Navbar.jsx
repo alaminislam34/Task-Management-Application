@@ -23,11 +23,20 @@ const Navbar = () => {
 
   const { theme, handleTheme, user } = useContext(authContext);
   return (
-    <div className="h-14">
-      <div className="fixed z-50 top-0 left-0 right-0 w-full shadow-xl bg-base-300">
+    <div className="h-[72px]">
+      <div
+        className={`fixed z-50 top-0 left-0 right-0 w-full shadow-sm ${
+          theme === "light" ? "bg-blue-50 text-gray-500" : "bg-blue-900/30"
+        }`}
+      >
         <nav className="flex justify-between items-center max-w-6xl mx-auto py-3 px-4">
           <div>
-            <img src={logo} alt="logo" className="w-12 h-12" />
+            <img
+              onClick={() => navigate("/")}
+              src={logo}
+              alt="logo"
+              className="w-12 h-12 cursor-pointer"
+            />
           </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
@@ -35,7 +44,11 @@ const Navbar = () => {
                 onClick={handleTheme}
                 className="p-2 rounded-full hover:bg-base-300 cursor-pointer"
               >
-                {theme === "dark" ? <CiLight /> : <CiDark />}
+                {theme === "dark" ? (
+                  <CiLight className="text-2xl" />
+                ) : (
+                  <CiDark className="text-2xl" />
+                )}
               </button>
               {user && (
                 <div className="flex items-center gap-2">

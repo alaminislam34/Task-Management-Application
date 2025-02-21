@@ -35,7 +35,7 @@ const AuthContext = ({ children }) => {
   // Format the fetched tasks
   const formattedTasks = data?.reduce(
     (acc, task) => {
-      const category = task.category.replace("-", "");
+      const category = task.category;
       if (!acc[category]) acc[category] = [];
       acc[category].push(task);
       return acc;
@@ -142,7 +142,8 @@ const AuthContext = ({ children }) => {
     return () => {
       socket.off("taskUpdate");
     };
-  }, []);
+  }, [tasks]);
+
   // User info for context
   const info = {
     theme,

@@ -6,6 +6,9 @@ import { CiEdit } from "react-icons/ci";
 import Modal from "./Modal";
 import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
+import { RiCalendarTodoLine } from "react-icons/ri";
+import { GrInProgress } from "react-icons/gr";
+import { AiOutlineFileDone } from "react-icons/ai";
 const TaskBoard = () => {
   const { theme, setModalTask, tasks, setTasks, refetch } =
     useContext(authContext);
@@ -92,7 +95,16 @@ const TaskBoard = () => {
                       }`
                 }`}
               >
-                <h2 className="text-lg font-semibold mb-2">{category}</h2>
+                <h2 className="text-lg font-semibold mb-2 flex justify-between items-center">
+                  {category}{" "}
+                  {category === "Done" ? (
+                    <AiOutlineFileDone className={`text-xl md:text-2xl`} />
+                  ) : category === "InProgress" ? (
+                    <GrInProgress className={`text-xl md:text-2xl`} />
+                  ) : (
+                    <RiCalendarTodoLine className={`text-xl md:text-2xl`} />
+                  )}
+                </h2>
                 {tasks[category]
                   ?.slice()
                   .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
