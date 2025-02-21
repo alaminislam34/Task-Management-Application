@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CiDark, CiLight, CiLogout } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { authContext } from "../../ContextApi/AuthContext";
@@ -13,6 +13,7 @@ const Navbar = () => {
   const { loading } = useContext(authContext);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
+  const showRef = useRef();
   const logout = () => {
     signOut(auth);
     navigate("/login");
@@ -21,6 +22,21 @@ const Navbar = () => {
       return <Loading />;
     }
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showRef.current && !showRef.current.contains(event.target)) {
+        setShow(false);
+      }
+    };
+
+    if (show) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [show, setShow]);
 
   const { theme, handleTheme, user } = useContext(authContext);
   return (
@@ -47,7 +63,7 @@ const Navbar = () => {
                 )}
               </button>
               {user && (
-                <div className="flex items-center gap-2 relative">
+                <div className="flex items-center gap-2 relative" ref={showRef}>
                   <img
                     src={user?.photoURL}
                     onClick={() => setShow(!show)}
@@ -55,20 +71,27 @@ const Navbar = () => {
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 rounded-full cursor-pointer"
                   />
-                  {show && (
-                    <div className="absolute top-14 right-0 w-44 p-4 text-left space-y-2 rounded-xl shadow-xl">
-                      <p>{user?.displayName}</p>
-                      <p>{user?.email}</p>
-                    </div>
-                  )}
-                  <button
-                    onClick={logout}
-                    className={`flex items-center gap-2 py-2 px-2 ${
-                      theme === "light" ? "bg-red-200" : "bg-red-900"
-                    } rounded-lg cursor-pointer font-medium`}
+
+                  <div
+                    className={`absolute duration-500 ${
+                      show
+                        ? "top-16 opacity-100"
+                        : "top-20 opacity-0 pointer-events-none"
+                    } right-0 w-52 px-4 py-6 text-left space-y-2 rounded-xl shadow-xl ${
+                      theme === "light" ? "bg-blue-50" : "bg-[#1C2948]"
+                    }`}
                   >
-                    <CiLogout className="text-lg" />
-                  </button>
+                    <p>{user?.displayName}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                    <button
+                      onClick={logout}
+                      className={`flex items-center gap-2 py-2 px-2 w-full ${
+                        theme === "light" ? "bg-red-200" : "bg-red-900"
+                      } rounded-lg cursor-pointer font-medium`}
+                    >
+                      <CiLogout className="text-lg" /> Logout
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

@@ -38,7 +38,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className={`h-screen flex justify-center items-center `}>
+    <div className={`h-screen flex justify-center items-center mx-4`}>
       <div
         className={`max-w-md mx-auto h-[50vh] p-4 md:p-6 lg:p-8 shadow-xl flex flex-col justify-center  rounded-lg space-y-4 ${
           theme === "light" ? "bg-blue-200" : "bg-blue-950/40"

@@ -9,11 +9,11 @@ const Home = () => {
     <div>
       <AddTask />
       <div
-        className={`text-center py-4 ${
+        className={`text-center py-4 px-2 space-y-2 ${
           theme === "light" ? "bg-blue-50" : "bg-[#1C2948]"
         }`}
       >
-        <h2 className="text-lg md:text-xl lg:text-2xl font-semibold">
+        <h2 className="text-xl lg:text-2xl font-semibold">
           Welcome to Your Task Management App!
         </h2>
         <p className="text-sm md:text-base lg:text-lg">
