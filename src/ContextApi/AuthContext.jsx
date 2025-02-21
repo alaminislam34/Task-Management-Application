@@ -4,10 +4,8 @@ import { createContext, useEffect, useState } from "react";
 import { auth } from "../Firebase/Firebase.config";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import socket from "../Pages/Home/TaskBoard/Socket";
 
 // Fetch tasks function
-
 export const authContext = createContext();
 
 const AuthContext = ({ children }) => {
@@ -21,8 +19,10 @@ const AuthContext = ({ children }) => {
   const { data, refetch } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
+      if (!user) return;
       const response = await axios.get(
-        `${import.meta.env.VITE_URL}/tasks?email=${user?.email}`
+        `${import.meta.env.VITE_URL}/tasks?email=${user.email}`,
+        { withCredentials: true }
       );
       return response.data;
     },
@@ -30,26 +30,20 @@ const AuthContext = ({ children }) => {
   });
 
   // Format the fetched tasks
-  const formattedTasks = data?.reduce(
-    (acc, task) => {
-      const category = task.category;
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(task);
-      return acc;
-    },
-    { ToDo: [], InProgress: [], Done: [] }
-  );
-
   useEffect(() => {
-    if (formattedTasks) {
-      setTasks((prevTasks) => {
-        if (!deepEqual(prevTasks, formattedTasks)) {
-          return formattedTasks;
-        }
-        return prevTasks;
-      });
+    if (data) {
+      const formattedTasks = data.reduce(
+        (acc, task) => {
+          acc[task.category] = acc[task.category] || [];
+          acc[task.category].push(task);
+          return acc;
+        },
+        { ToDo: [], InProgress: [], Done: [] }
+      );
+      setTasks(formattedTasks);
     }
-  }, [formattedTasks]);
+  }, [data]);
+
   // Toggle the theme
   const handleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -57,85 +51,37 @@ const AuthContext = ({ children }) => {
 
   useEffect(() => {
     setLoading(true);
-
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-
         try {
           const { data } = await axios.get(
-            `${import.meta.env.VITE_URL}/users?email=${user?.email}`,
+            `${import.meta.env.VITE_URL}/users?email=${user.email}`,
             { withCredentials: true }
           );
-
           if (!data) {
             await axios.post(
               `${import.meta.env.VITE_URL}/postUser`,
-              {
-                name: user?.displayName,
-                email: user?.email,
-              },
+              { name: user.displayName, email: user.email },
               { withCredentials: true }
             );
           }
         } catch (error) {
           console.error("Error checking/adding user:", error);
-        } finally {
-          setLoading(false);
         }
       } else {
         setUser(null);
-        setLoading(false);
       }
+      setLoading(false);
     });
-
     return () => unsubscribe();
-  }, [setUser, setLoading]);
+  }, []);
 
   // Theme control on browser
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
-
-  useEffect(() => {
-    socket.on("taskUpdate", (data) => {
-      setTasks((prevTasks) => {
-        if (data.type === "insert") {
-          return {
-            ...prevTasks,
-            [data.task.category]: [
-              ...(prevTasks[data.task.category] || []),
-              data.task,
-            ],
-          };
-        } else if (data.type === "update") {
-          return {
-            ...prevTasks,
-            [data.task.category]: prevTasks[data.task.category]
-              ? prevTasks[data.task.category].map((task) =>
-                  task._id === data.task._id ? data.task : task
-                )
-              : [],
-          };
-        } else if (data.type === "delete") {
-          return {
-            ...prevTasks,
-            [data.category]: prevTasks[data.category]
-              ? prevTasks[data.category].filter(
-                  (task) => task._id !== data.taskId
-                )
-              : [],
-          };
-        }
-        return prevTasks;
-      });
-    });
-
-    return () => {
-      socket.off("taskUpdate");
-    };
-  }, [tasks]);
 
   // User info for context
   const info = {
@@ -156,8 +102,3 @@ const AuthContext = ({ children }) => {
 };
 
 export default AuthContext;
-
-// Helper function to compare objects deeply
-function deepEqual(obj1, obj2) {
-  return JSON.stringify(obj1) === JSON.stringify(obj2);
-}

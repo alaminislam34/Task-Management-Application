@@ -9,32 +9,66 @@ import { toast } from "react-toastify";
 import { RiCalendarTodoLine } from "react-icons/ri";
 import { GrInProgress } from "react-icons/gr";
 import { AiOutlineFileDone } from "react-icons/ai";
+
 const TaskBoard = () => {
   const { theme, setModalTask, tasks, setTasks, refetch } =
     useContext(authContext);
+
   const onDragEnd = (result) => {
     const { source, destination } = result;
+
+    // If dropped outside of droppable area
     if (!destination) return;
 
     const sourceCategory = source.droppableId;
     const destinationCategory = destination.droppableId;
 
+    // Restrict dragging tasks from Done category
     if (sourceCategory === "Done") return;
 
+    // Restrict direct movement from ToDo to Done
+    if (sourceCategory === "ToDo" && destinationCategory === "Done") return;
+
+    // Restrict movement from InProgress back to ToDo
+    if (sourceCategory === "InProgress" && destinationCategory === "ToDo")
+      return;
+
+    const sourceTasks = [...tasks[sourceCategory]];
+
     if (sourceCategory === destinationCategory) {
-      const reorderedTasks = [...tasks[sourceCategory]];
-      const [movedTask] = reorderedTasks.splice(source.index, 1);
-      reorderedTasks.splice(destination.index, 0, movedTask);
+      // Reorder within the same category and update serial
+      const [movedTask] = sourceTasks.splice(source.index, 1);
+      sourceTasks.splice(destination.index, 0, movedTask);
+
+      const updatedTasks = sourceTasks.map((task, index) => ({
+        ...task,
+        serial: index + 1, // Update serial based on new position
+      }));
 
       setTasks({
         ...tasks,
-        [sourceCategory]: reorderedTasks,
+        [sourceCategory]: updatedTasks,
       });
+      console.log(updatedTasks, sourceCategory);
+      // **PUT API Call to Update Order**
+      axios
+        .put(
+          `${import.meta.env.VITE_URL}/tasksUpdateOrder`,
+          { tasks: updatedTasks },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          if (res.data.modifiedCount > 0) {
+            refetch();
+          }
+        })
+        .catch((err) => console.log("Error updating order:", err));
     } else {
-      const sourceTasks = [...tasks[sourceCategory]];
+      // Move task between categories
       const destinationTasks = [...(tasks[destinationCategory] || [])];
       const [movedTask] = sourceTasks.splice(source.index, 1);
 
+      // Lock task if moved to Done category
       if (destinationCategory === "Done") {
         movedTask.isLocked = true;
       }
@@ -42,21 +76,34 @@ const TaskBoard = () => {
       movedTask.category = destinationCategory;
       destinationTasks.splice(destination.index, 0, movedTask);
 
+      // Update state with new task order
       setTasks({
         ...tasks,
         [sourceCategory]: sourceTasks,
         [destinationCategory]: destinationTasks,
       });
 
-      axios.put(`${import.meta.env.VITE_URL}/tasks/${movedTask._id}`, {
-        category: destinationCategory,
-      });
+      // **PUT API Call to Update Category and Lock Status**
+      axios
+        .put(
+          `${import.meta.env.VITE_URL}/tasks/${movedTask._id}`,
+          { category: destinationCategory, isLocked: movedTask.isLocked },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          if (res.data.modifiedCount > 0) {
+            refetch();
+          }
+        })
+        .catch((err) => console.log("Error updating task category:", err));
     }
   };
 
   const handleDeleteTask = (taskId) => {
     axios
-      .delete(`${import.meta.env.VITE_URL}/tasks/${taskId}`)
+      .delete(`${import.meta.env.VITE_URL}/tasks/${taskId}`, {
+        withCredentials: true,
+      })
       .then((res) => {
         console.log(res.data);
         refetch();
@@ -105,9 +152,9 @@ const TaskBoard = () => {
                     <RiCalendarTodoLine className={`text-xl md:text-2xl`} />
                   )}
                 </h2>
+
                 {tasks[category]
-                  ?.slice()
-                  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                  ?.sort((a, b) => a.serial - b.serial)
                   .map((task, index) => (
                     <Draggable
                       key={task._id}
@@ -116,13 +163,13 @@ const TaskBoard = () => {
                       isDragDisabled={category === "Done" || task.isLocked}
                     >
                       {(provided) => (
-                        <div
+                        <li
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...(category !== "Done" && provided.dragHandleProps)}
-                          className="p-2 my-2 shadow-xl rounded-md cursor-move relative"
+                          className="p-2 my-2 shadow-xl rounded-md cursor-move relative list-decimal"
                         >
-                          {category !== "Done" && (
+                          {category === "ToDo" && (
                             <div className="absolute top-2 right-2 flex gap-4 items-center">
                               <button
                                 onClick={() => {
@@ -144,18 +191,10 @@ const TaskBoard = () => {
                           )}
                           <div className="space-y-2">
                             <p className="text-xs">{task.timestamp}</p>
-                            <div className="absolute top-2 right-2">
-                              <button
-                                onClick={() => handleDeleteTask(task._id)}
-                                className="cursor-pointer"
-                              >
-                                <MdDelete />
-                              </button>
-                            </div>
                             <h4 className="font-bold">{task.title}</h4>
                             <p className="text-sm ">{task.description}</p>
                           </div>
-                        </div>
+                        </li>
                       )}
                     </Draggable>
                   ))}

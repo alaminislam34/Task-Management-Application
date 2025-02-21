@@ -27,7 +27,9 @@ const AddTask = () => {
       return toast.error("All fields are required");
     } else {
       axios
-        .post(`${import.meta.env.VITE_URL}/addTask`, task)
+        .post(`${import.meta.env.VITE_URL}/addTask`, task, {
+          withCredentials: true,
+        })
         .then((res) => {
           console.log(res.data);
           if (res.data.insertedId) {

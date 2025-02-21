@@ -3,7 +3,6 @@ import { authContext } from "../../../ContextApi/AuthContext";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 import axios from "axios";
-import socket from "./Socket";
 
 const Modal = () => {
   const { modalTask, refetch } = useContext(authContext);
@@ -20,14 +19,14 @@ const Modal = () => {
       axios
         .patch(
           `${import.meta.env.VITE_URL}/updateTask/${modalTask._id}`,
-          updatedTask
+          updatedTask,
+          { withCredentials: true }
         )
         .then((res) => {
           console.log(res.data);
           toast.success("Task updated successfully");
           form.reset();
           refetch();
-          socket.emit("updateTask", updatedTask);
           document.getElementById("my_modal_5").close();
         })
         .catch((err) => {
