@@ -4,11 +4,10 @@ import axios from "axios";
 import { authContext } from "../../../ContextApi/AuthContext";
 import { CiEdit } from "react-icons/ci";
 import Modal from "./Modal";
-import { MdDelete } from "react-icons/md";
 import { toast } from "react-toastify";
-import { RiCalendarTodoLine } from "react-icons/ri";
+import { IoCalendarOutline } from "react-icons/io5";
 import { GrInProgress } from "react-icons/gr";
-import { AiOutlineFileDone } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineFileDone } from "react-icons/ai";
 
 const TaskBoard = () => {
   const { theme, setModalTask, tasks, setTasks, refetch } =
@@ -71,7 +70,9 @@ const TaskBoard = () => {
       // Lock task if moved to Done category
       if (destinationCategory === "Done") {
         movedTask.isLocked = true;
-        toast.success("Task successfully Completed!");
+        toast.success("🎉 Great job! Task completed successfully!", {
+          theme: theme === "light" ? "light" : "dark",
+        });
       }
       if (destinationCategory === "InProgress") {
         toast.info("Task moved to InProgress", {
@@ -114,7 +115,10 @@ const TaskBoard = () => {
       .then((res) => {
         console.log(res.data);
         refetch();
-        toast.success("Task deleted successfully");
+        toast.success(`🗑️ Task deleted successfully!`, {
+          icon: false,
+          theme: theme === "light" ? "light" : "dark",
+        });
       })
       .catch((err) => console.log(err));
   };
@@ -134,18 +138,18 @@ const TaskBoard = () => {
                     ? `${
                         theme === "light"
                           ? "bg-[#A5D6A7] text-gray-600"
-                          : "bg-[#1B5E20] text-gray-300"
+                          : "bg-[#1B5E20]/50 text-gray-300"
                       }`
                     : category === "InProgress"
                     ? `${
                         theme === "light"
                           ? "bg-[#FFE082] text-gray-600"
-                          : "bg-[#947400] text-gray-300"
+                          : "bg-[#947400]/50 text-gray-300"
                       }`
                     : `${
                         theme === "light"
                           ? "bg-[#BBDEFB] text-gray-600"
-                          : "bg-[#1E3A8A] text-gray-300"
+                          : "bg-[#1E3A8A]/50 text-gray-300"
                       }`
                 }`}
               >
@@ -156,7 +160,7 @@ const TaskBoard = () => {
                   ) : category === "InProgress" ? (
                     <GrInProgress className={`text-xl md:text-2xl`} />
                   ) : (
-                    <RiCalendarTodoLine className={`text-xl md:text-2xl`} />
+                    <IoCalendarOutline className={`text-xl md:text-2xl`} />
                   )}
                 </h2>
 
@@ -174,7 +178,11 @@ const TaskBoard = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...(category !== "Done" && provided.dragHandleProps)}
-                          className="p-2 my-4 shadow-md rounded-md cursor-move backdrop-blur-md relative list-decimal"
+                          className={`p-2 my-4 rounded-md cursor-move backdrop-blur-md ${
+                            theme === "light"
+                              ? "shadow-[0px_0px_10px_0px_rgb(0,0,0,0.2)]"
+                              : "shadow-[0px_0px_15px_0px_rgb(255,255,255,0.2)]"
+                          } relative list-decimal`}
                         >
                           {category === "ToDo" && (
                             <div className="absolute top-2 right-2 flex gap-4 items-center">
@@ -192,7 +200,7 @@ const TaskBoard = () => {
                                 onClick={() => handleDeleteTask(task._id)}
                                 className="cursor-pointer"
                               >
-                                <MdDelete />
+                                <AiOutlineDelete />
                               </button>
                             </div>
                           )}
@@ -201,13 +209,50 @@ const TaskBoard = () => {
                               onClick={() => handleDeleteTask(task._id)}
                               className="cursor-pointer"
                             >
-                              <MdDelete />
+                              <AiOutlineDelete />
                             </button>
                           </div>
-                          <div className="space-y-2">
-                            <p className="text-xs">{task.timestamp}</p>
-                            <h4 className="font-bold">{task.title}</h4>
-                            <p className="text-sm ">{task.description}</p>
+                          <div className="space-y-1">
+                            <p
+                              className={`text-xs text-right pr-2 ${
+                                category === "ToDo" &&
+                                new Date(task.dueDate) < new Date()
+                                  ? "text-red-400"
+                                  : ""
+                              }`}
+                            >
+                              {" "}
+                              {category !== "ToDo"
+                                ? new Date(task.timestamp).toLocaleString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "2-digit",
+                                      year: "numeric",
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    }
+                                  )
+                                : "Due On: " +
+                                  " " +
+                                  new Date(task.dueDate).toLocaleString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "2-digit",
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    }
+                                  )}
+                            </p>
+                            <h4 className="md:text-lg font-bold">
+                              {task.title}
+                            </h4>
+                            <p className="text-xs md:text-sm">
+                              {task.description}
+                            </p>
                           </div>
                         </li>
                       )}

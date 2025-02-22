@@ -24,14 +24,18 @@ const Modal = () => {
         )
         .then((res) => {
           console.log(res.data);
-          toast.success("Task updated successfully");
+          toast.success("Task updated successfully", {
+            theme: theme === "light" ? "light" : "dark",
+          });
           form.reset();
           refetch();
           document.getElementById("my_modal_5").close();
         })
         .catch((err) => {
           console.log(err);
-          toast.error("Something went wrong");
+          toast.error("Something went wrong", {
+            theme: theme === "light" ? "light" : "dark",
+          });
           form.reset();
         });
     }
@@ -57,13 +61,13 @@ const Modal = () => {
                 className="py-2 px-4 rounded-md border border-gray-600 focus:outline-none focus:border-gray-400"
                 type="text"
                 name="title"
-                defaultValue={modalTask.title}
+                defaultValue={modalTask.title && modalTask.title}
               />
               <input
                 className="py-2 px-4 rounded-md border border-gray-600 focus:outline-none focus:border-gray-400"
                 type="text"
                 name="description"
-                defaultValue={modalTask.description}
+                defaultValue={modalTask.description && modalTask.description}
               />
               <input
                 type="submit"

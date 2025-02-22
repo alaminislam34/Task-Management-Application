@@ -15,6 +15,7 @@ const AuthContext = ({ children }) => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [modalTask, setModalTask] = useState([]);
   const [tasks, setTasks] = useState({ ToDo: [], InProgress: [], Done: [] });
+  const [allUsers, setAllUsers] = useState([]);
 
   // Use the useQuery hook to fetch tasks
   const { data, refetch } = useQuery({
@@ -55,20 +56,18 @@ const AuthContext = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        try {
-          const { data } = await axios.get(
-            `${import.meta.env.VITE_URL}/users?email=${user.email}`,
+
+        const { data } = await axios.get(`${import.meta.env.VITE_URL}/users`, {
+          withCredentials: true,
+        });
+        setAllUsers(data);
+        const exists = data.find((u) => u.email === user?.email);
+        if (!exists) {
+          await axios.post(
+            `${import.meta.env.VITE_URL}/postUser`,
+            { name: user.displayName, email: user.email },
             { withCredentials: true }
           );
-          if (!data) {
-            await axios.post(
-              `${import.meta.env.VITE_URL}/postUser`,
-              { name: user.displayName, email: user.email },
-              { withCredentials: true }
-            );
-          }
-        } catch (error) {
-          console.error("Error checking/adding user:", error);
         }
       } else {
         setUser(null);
@@ -97,6 +96,7 @@ const AuthContext = ({ children }) => {
     tasks,
     setTasks,
     refetch,
+    allUsers,
   };
 
   return <authContext.Provider value={info}>{children}</authContext.Provider>;
