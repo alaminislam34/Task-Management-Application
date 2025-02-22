@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { authContext } from "../../ContextApi/AuthContext";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../Firebase/Firebase.config";
+import bgImage from "../../assets/task.jpg";
 import Aos from "aos";
 import "aos/dist/aos.css";
 
@@ -21,7 +22,7 @@ const Login = () => {
         toast.success("Login Successfully", {
           theme: theme === "light" ? "light" : "dark",
           className:
-            "text-center flex items-center justify-center flex-warp flex-row",
+            "text-center flex items-center justify-center flex-wrap flex-row",
         });
         setUser(result.user);
         setLoading(false);
@@ -30,7 +31,7 @@ const Login = () => {
         toast.error("Something went wrong", {
           theme: theme === "light" ? "light" : "dark",
           className:
-            "text-center flex items-center justify-center flex-warp flex-row",
+            "text-center flex items-center justify-center flex-wrap flex-row",
         });
         setLoading(false);
       });
@@ -45,42 +46,32 @@ const Login = () => {
   }, []);
 
   return (
-    <div className={`h-screen flex justify-center items-center mx-4`}>
+    <div
+      style={{ backgroundImage: `url(${bgImage})` }}
+      className="h-screen w-screen flex justify-center items-center bg-cover bg-center px-6 relative"
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+
       <div
-        className={`max-w-md mx-auto h-[50vh] p-4 md:p-6 lg:p-8 shadow-xl flex flex-col justify-center  rounded-lg space-y-4 ${
-          theme === "light" ? "bg-blue-200" : "bg-blue-950/40"
-        }`}
+        data-aos="zoom-in"
+        className="relative z-10 w-full max-w-md p-8 flex flex-col justify-center items-center rounded-xl space-y-6 bg-white shadow-[0px_10px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl"
       >
-        <h2
-          data-aos="fade-up"
-          data-aos-delay="100"
-          data-aos-anchor-placement="top-center"
-          className="text-2xl md:text-3xl lg:text-4xl font-bold text-center"
-        >
-          Sign in with google
+        <h2 className="text-3xl lg:text-4xl font-extrabold text-center text-black tracking-wide">
+          Sign in with Google
         </h2>
-        <p
-          data-aos="fade-up"
-          data-aos-delay="200"
-          data-aos-anchor-placement="top-center"
-          className="text-xs lg:text-base text-center text-gray-500"
-        >
+        <p className="text-sm lg:text-base text-center text-black">
           Secure and fast sign-in for easy access to your account.
         </p>
-        <div
-          data-aos="fade-up"
-          data-aos-delay="400"
-          data-aos-anchor-placement="top-bottom"
-          className="flex items-center justify-center"
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="flex items-center gap-3 px-4 py-2 text-black rounded-lg border  shadow-lg font-semibold text-sm cursor-pointer transition-all duration-300 hover:shadow-xl hover:rounded-4xl"
         >
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="flex items-center gap-2 justify-center p-3 hover:-translate-y-1 duration-300 hover:scale-105 rounded-full border cursor-pointer"
-          >
-            <FcGoogle className="text-xl" />
-          </button>
-        </div>
+          <FcGoogle className="text-2xl" />
+          Google
+        </button>
       </div>
     </div>
   );
