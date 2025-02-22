@@ -26,6 +26,8 @@ const Modal = () => {
         )
         .then(() => {
           toast.success("Task updated successfully", {
+            className:
+              "text-center flex justify-center items-center flex-row gap-2",
             theme: theme === "light" ? "light" : "dark",
           });
           form.reset();
