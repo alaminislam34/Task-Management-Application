@@ -17,7 +17,11 @@ const Navbar = () => {
   const logout = () => {
     signOut(auth);
     navigate("/login");
-    toast.info("Logout Successfully");
+    toast.info("Logout Successfully", {
+      className:
+        "text-center flex items-center justify-center flex-warp flex-row gap-2",
+      theme: theme === "light" ? "light" : "dark",
+    });
     if (loading) {
       return <Loading />;
     }

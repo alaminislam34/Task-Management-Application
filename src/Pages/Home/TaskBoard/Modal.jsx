@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { authContext } from "../../../ContextApi/AuthContext";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
@@ -6,6 +6,7 @@ import axios from "axios";
 
 const Modal = () => {
   const { modalTask, refetch, theme } = useContext(authContext);
+  const [error, setError] = useState(null);
   const handleUpdateTask = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -14,16 +15,16 @@ const Modal = () => {
     const updatedTask = { title, description };
     console.table({ title, description });
     if (!title || !description) {
-      return toast.error("All fields are required");
+      return setError("All fields are required");
     } else {
+      setError(null);
       axios
         .patch(
           `${import.meta.env.VITE_URL}/updateTask/${modalTask._id}`,
           updatedTask,
           { withCredentials: true }
         )
-        .then((res) => {
-          console.log(res.data);
+        .then(() => {
           toast.success("Task updated successfully", {
             theme: theme === "light" ? "light" : "dark",
           });
@@ -32,11 +33,7 @@ const Modal = () => {
           document.getElementById("my_modal_5").close();
         })
         .catch((err) => {
-          console.log(err);
-          toast.error("Something went wrong", {
-            theme: theme === "light" ? "light" : "dark",
-          });
-          form.reset();
+          setError(err.message);
         });
     }
   };
@@ -57,6 +54,11 @@ const Modal = () => {
               <p className="text-xl lg:text-2xl font-semibold py-2 lg:py-4">
                 Edit Task
               </p>
+              {error ? (
+                <p className="text-error text-xs py-2"> {error} </p>
+              ) : (
+                ""
+              )}
               <input
                 className="py-2 px-4 rounded-md border border-gray-600 focus:outline-none focus:border-gray-400"
                 type="text"

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { authContext } from "../../ContextApi/AuthContext";
-import { MdClose } from "react-icons/md";
+import { MdAddTask, MdClose } from "react-icons/md";
 
 const AddTask = () => {
   const { refetch, user, theme } = useContext(authContext);
@@ -35,7 +35,11 @@ const AddTask = () => {
     };
 
     if (!title || !description || !category) {
-      return toast.error("All fields are required");
+      return toast.error("All fields are required", {
+        className:
+          "text-center flex items-center justify-center flex-warp flex-row gap-2",
+        theme: theme === "light" ? "light" : "dark",
+      });
     } else {
       axios
         .post(`${import.meta.env.VITE_URL}/addTask`, task, {
@@ -44,12 +48,16 @@ const AddTask = () => {
         .then((res) => {
           if (res.data.insertedId) {
             refetch();
-            toast.success("Task added successfully");
+            toast.success("Task added successfully", {
+              icon: <MdAddTask />,
+              className:
+                "text-center flex items-center justify-center flex-warp flex-row gap-2",
+              theme: theme === "light" ? "light" : "dark",
+            });
             form.reset();
             document.getElementById("my_modal_4").close();
           }
-        })
-        .catch((err) => console.log(err));
+        });
     }
   };
 

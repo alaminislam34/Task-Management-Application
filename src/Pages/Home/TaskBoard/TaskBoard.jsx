@@ -48,7 +48,6 @@ const TaskBoard = () => {
         ...tasks,
         [sourceCategory]: updatedTasks,
       });
-      console.log(updatedTasks, sourceCategory);
       // **PUT API Call to Update Order**
       axios
         .put(
@@ -60,8 +59,7 @@ const TaskBoard = () => {
           if (res.data.modifiedCount > 0) {
             refetch();
           }
-        })
-        .catch((err) => console.log("Error updating order:", err));
+        });
     } else {
       // Move task between categories
       const destinationTasks = [...(tasks[destinationCategory] || [])];
@@ -71,11 +69,16 @@ const TaskBoard = () => {
       if (destinationCategory === "Done") {
         movedTask.isLocked = true;
         toast.success("🎉 Great job! Task completed successfully!", {
+          icon: false,
+          className:
+            "text-center flex items-center justify-center flex-warp flex-row",
           theme: theme === "light" ? "light" : "dark",
         });
       }
       if (destinationCategory === "InProgress") {
         toast.info("Task moved to InProgress", {
+          className:
+            "text-center flex items-center justify-center flex-warp flex-row",
           icon: <GrInProgress />,
           theme: theme === "light" ? "light" : "dark",
         });
@@ -102,8 +105,7 @@ const TaskBoard = () => {
           if (res.data.modifiedCount > 0) {
             refetch();
           }
-        })
-        .catch((err) => console.log("Error updating task category:", err));
+        });
     }
   };
 
@@ -112,15 +114,15 @@ const TaskBoard = () => {
       .delete(`${import.meta.env.VITE_URL}/tasks/${taskId}`, {
         withCredentials: true,
       })
-      .then((res) => {
-        console.log(res.data);
+      .then(() => {
         refetch();
         toast.success(`🗑️ Task deleted successfully!`, {
+          className:
+            "text-center flex items-center justify-center flex-warp flex-row",
           icon: false,
           theme: theme === "light" ? "light" : "dark",
         });
-      })
-      .catch((err) => console.log(err));
+      });
   };
 
   return (

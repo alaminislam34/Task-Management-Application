@@ -18,13 +18,20 @@ const Login = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
         navigate("/");
-        toast.success("Login Successfully");
+        toast.success("Login Successfully", {
+          theme: theme === "light" ? "light" : "dark",
+          className:
+            "text-center flex items-center justify-center flex-warp flex-row",
+        });
         setUser(result.user);
         setLoading(false);
       })
-      .catch((e) => {
-        toast.error("Something went wrong");
-        console.log(e);
+      .catch(() => {
+        toast.error("Something went wrong", {
+          theme: theme === "light" ? "light" : "dark",
+          className:
+            "text-center flex items-center justify-center flex-warp flex-row",
+        });
         setLoading(false);
       });
   };
