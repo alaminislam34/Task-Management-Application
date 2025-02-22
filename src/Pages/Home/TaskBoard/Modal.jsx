@@ -3,6 +3,7 @@ import { authContext } from "../../../ContextApi/AuthContext";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { GrUpdate } from "react-icons/gr";
 
 const Modal = () => {
   const { modalTask, refetch, theme } = useContext(authContext);
@@ -26,6 +27,7 @@ const Modal = () => {
         )
         .then(() => {
           toast.success("Task updated successfully", {
+            icon: <GrUpdate />,
             className:
               "text-center flex justify-center items-center flex-row gap-2",
             theme: theme === "light" ? "light" : "dark",

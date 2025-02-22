@@ -236,7 +236,7 @@ const TaskBoard = () => {
                                       hour12: true,
                                     }
                                   )
-                                : "Due On: " +
+                                : "Due On : " +
                                   " " +
                                   new Date(task.dueDate).toLocaleString(
                                     "en-US",
